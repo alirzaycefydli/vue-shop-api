@@ -1,5 +1,26 @@
 <script setup>
+import {ref} from 'vue'
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
 
+const authStore = useAuthStore()
+const router = useRouter()
+
+const data = ref({
+  email:'',
+  password:'',
+})
+
+const errors = ref({})
+
+const login = async () => {
+  try {
+    await authStore.authenticate('login', data.value);
+    router.push({ name: 'home' });
+  } catch (err) {
+    errors.value = err.response?.data || {};
+  }
+}
 </script>
 
 <template>
@@ -23,19 +44,21 @@
         <div class="w-full px-[12px]">
           <div
             class="bb-login-contact max-w-[500px] m-[auto] border-[1px] border-solid border-[#eee] p-[30px] rounded-[20px]">
-            <form>
+            <form @submit.prevent="login()">
               <div class="bb-login-wrap mb-[24px]">
                 <label for="email"
                   class="inline-block font-Poppins text-[15px] font-normal text-[#686e7d] leading-[26px] tracking-[0.02rem]">Email*</label>
-                <input type="email" id="email" name="email" placeholder="Enter Your Email"
+                <input v-model="data.email" type="email" id="email" name="email" placeholder="Enter Your Email"
                   class="w-full p-[10px] text-[14px] font-normal text-[#686e7d] border-[1px] border-solid border-[#eee] outline-[0] leading-[26px] rounded-[10px]">
+                  <small v-if="errors.errors?.email" class="text-red-600">{{ errors.errors?.email[0] }}</small>
               </div>
               <div class="bb-login-wrap mb-[24px]">
                 <label for="email"
                   class="inline-block font-Poppins text-[15px] font-normal text-[#686e7d] leading-[26px] tracking-[0.02rem]">Password*</label>
-                <input type="password" id="password" name="password"
+                <input v-model="data.password" type="password" id="password" name="password"
                   placeholder="Enter Your Password"
                   class="w-full p-[10px] text-[14px] font-normal text-[#686e7d] border-[1px] border-solid border-[#eee] outline-[0] leading-[26px] rounded-[10px]">
+                  <small v-if="errors.errors?.password" class="text-red-600">{{ errors.errors?.password[0] }}</small>
               </div>
               <div class="bb-login-wrap mb-[24px]">
                 <a href="javascript:void(0)"
