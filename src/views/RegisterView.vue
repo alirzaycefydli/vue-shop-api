@@ -1,5 +1,29 @@
 <script setup>
+import {ref} from 'vue'
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
 
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+const data = ref({
+  name:'',
+  email:'',
+  password:'',
+  password_confirmation:''
+})
+
+const errors = ref({})
+
+const register = async () => {
+  try {
+    await authStore.authenticate('register', data.value);
+    router.push({ name: 'home' });
+  } catch (err) {
+    errors.value = err.response?.data || {};
+  }
+}
 </script>
 
 <template>
@@ -16,37 +40,40 @@
                 Register</h2>
               <p
                 class="font-Poppins max-w-[400px] mt-[10px] text-[14px] text-[#686e7d] leading-[18px] font-light tracking-[0.03rem] max-[991px]:mx-[auto]">
-                Best place to buy and sell digital products</p>
+                Best place to buy and sell products</p>
             </div>
           </div>
         </div>
         <div class="w-full px-[12px]">
           <div
             class="bb-login-contact max-w-[500px] m-[auto] border-[1px] border-solid border-[#eee] p-[30px] rounded-[20px]">
-            <form>
+            <form @submit.prevent="register()">
                 <div class="bb-login-wrap mb-[24px]">
                 <label for="name"
                   class="inline-block font-Poppins text-[15px] font-normal text-[#686e7d] leading-[26px] tracking-[0.02rem]">Name*</label>
-                <input type="text" id="name" name="name" placeholder="Enter Your Name"
+                <input v-model="data.name" type="text" id="name" name="name" placeholder="Enter Your Name"
                   class="w-full p-[10px] text-[14px] font-normal text-[#686e7d] border-[1px] border-solid border-[#eee] outline-[0] leading-[26px] rounded-[10px]">
+                  <small v-if="errors.errors?.name" class="text-red-600">{{ errors.errors?.name[0] }}</small>
               </div>
               <div class="bb-login-wrap mb-[24px]">
                 <label for="email"
                   class="inline-block font-Poppins text-[15px] font-normal text-[#686e7d] leading-[26px] tracking-[0.02rem]">Email*</label>
-                <input type="email" id="email" name="email" placeholder="Enter Your Email"
+                <input v-model="data.email" type="email" id="email" name="email" placeholder="Enter Your Email"
                   class="w-full p-[10px] text-[14px] font-normal text-[#686e7d] border-[1px] border-solid border-[#eee] outline-[0] leading-[26px] rounded-[10px]">
+                  <small v-if="errors.errors?.email" class="text-red-600">{{ errors.errors?.email[0] }}</small>
               </div>
               <div class="bb-login-wrap mb-[24px]">
                 <label for="password"
                   class="inline-block font-Poppins text-[15px] font-normal text-[#686e7d] leading-[26px] tracking-[0.02rem]">Password*</label>
-                <input type="password" id="password" name="password"
+                <input v-model="data.password" type="password" id="password" name="password"
                   placeholder="Enter Your Password"
                   class="w-full p-[10px] text-[14px] font-normal text-[#686e7d] border-[1px] border-solid border-[#eee] outline-[0] leading-[26px] rounded-[10px]">
+                  <small v-if="errors.errors?.password" class="text-red-600">{{ errors.errors?.password[0] }}</small>
               </div>
               <div class="bb-login-wrap mb-[24px]">
                 <label for="password_confirmation"
                   class="inline-block font-Poppins text-[15px] font-normal text-[#686e7d] leading-[26px] tracking-[0.02rem]">Password Confirmation*</label>
-                <input type="password" id="password_confirmation" name="password_confirmation"
+                <input v-model="data.password_confirmation" type="password" id="password_confirmation" name="password_confirmation"
                   placeholder="Confirm Your Password"
                   class="w-full p-[10px] text-[14px] font-normal text-[#686e7d] border-[1px] border-solid border-[#eee] outline-[0] leading-[26px] rounded-[10px]">
               </div>
