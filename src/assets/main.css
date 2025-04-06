@@ -1,0 +1,14 @@
+
+@import "tailwindcss";
+@import "flowbite/src/themes/default";
+
+@import "../assets/css/vendor/remixicon.css";
+@import "../assets/css/vendor/swiper-bundle.min.css";
+@import "../assets/css/vendor/owl.carousel.min.css";
+@import "../assets/css/vendor/slick.min.css";
+@import "../assets/css/vendor/animate.min.css";
+@import "../assets/css/vendor/jquery-range-ui.css";
+@import "../assets/css/style.css";
+@import "../assets/css/dark.css";
+
+
