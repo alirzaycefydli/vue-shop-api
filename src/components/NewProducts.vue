@@ -1,16 +1,31 @@
 <script setup>
-// import {ref, onMounted} from 'vue'
-// import axios from 'axios'
+import { ref, onMounted } from 'vue';
+import { useProductStore } from '@/stores/product'
 
- 
-// const data = ref({});
+const products = ref({
+  id:'',
+  title:'',
+  short_description:'',
+  brand:'',
+  price:'',
+  discount_percent:'',
+  is_featured:'',
+})
+const errors = ref({})
+const productStore = useProductStore()
 
-// onMounted(() => {
-// axios
-//       .get('http://127.0.0.1:8000/api/v1/products')
-//       .then(response => data.value = response.data.data)
-//       .catch(error => console.log(error))
-// })
+const newProducts = async () => {
+  try {
+    const value = await productStore.newProducts()
+    products.value = value.data.data
+  } catch (error) {
+    console.error('Error fetching products:', error)
+    errors.value = error.response?.data || {}
+  }
+}
+onMounted(() => {
+  newProducts()
+})
 </script>
 
 <template>
@@ -37,7 +52,7 @@
         <div class="w-full">
           <div class="tab-content">
             <div class="flex flex-wrap w-full">
-              <div
+              <div v-for="product in products" :key="product.id"
                 class="min-[1200px]:w-[25%] min-[768px]:w-[33.33%] w-[50%] max-[480px]:w-full px-[12px] mb-[24px]">
                 <div
                   class="bb-pro-box bg-[#fff] border-[1px] border-solid border-[#eee] rounded-[20px]">
@@ -51,10 +66,10 @@
                       <div
                         class="inner-img relative block overflow-hidden pointer-events-none rounded-t-[20px]">
                         <img class="main-img transition-all duration-[0.3s] ease-in-out w-full"
-                          src="../assets/img/product/1.jpg" alt="title">
+                          :src="product.image" alt="{{ product.title }}">
                         <img
                           class="hover-img transition-all duration-[0.3s] ease-in-out absolute z-[2] top-[0] left-[0] opacity-[0] w-full"
-                          src="../assets/img/product/1.jpg" alt="title">
+                          :src="product.image" alt="{{ product.title }}">
                       </div>
                     </a>
                     <ul
@@ -87,27 +102,29 @@
                     <div class="bb-pro-subtitle mb-[8px] flex flex-wrap justify-between">
                       <p
                         class="transition-all duration-[0.3s] ease-in-out font-Poppins text-[13px] leading-[16px] text-[#777] font-light tracking-[0.03rem]">
-                        Brand</p>
+                        {{ product.brand }}</p>
                       <span class="bb-pro-rating">
                         <i
-                          class="ri-star-fill float-left text-[15px] mr-[3px] leading-[18px] text-[#fea99a]"></i>
-                        <i
-                          class="ri-star-fill float-left text-[15px] mr-[3px] leading-[18px] text-[#fea99a]"></i>
-                        <i
-                          class="ri-star-fill float-left text-[15px] mr-[3px] leading-[18px] text-[#fea99a]"></i>
-                        <i
-                          class="ri-star-fill float-left text-[15px] mr-[3px] leading-[18px] text-[#fea99a]"></i>
-                        <i
+                          v-for="(star,index) in parseInt(product.rating || 0)" :key="index" class="ri-star-fill float-left text-[15px] mr-[3px] leading-[18px] text-[#fea99a]"></i>
+                       <!--  <i 
+                        v-if="Math.floor(product.rating) < 5" 
+                        v-for="(star,index) in (5 - Math.floor(product.rating))" :key="index"
+                          class="ri-star-line float-left text-[15px] mr-[3px] leading-[18px] text-[#777]"></i>-->
+
+                          <template v-if="(product.rating || 0) < 5">
+                            <i 
+                          v-for="(star,index) in (5 - parseInt(product.rating || 0))" :key="index"
                           class="ri-star-line float-left text-[15px] mr-[3px] leading-[18px] text-[#777]"></i>
-                      </span>
+                          </template>
+                      </span> 
                     </div>
                     <a href="#"
-                      class="transition-all duration-[0.3s] ease-in-out font-Poppins text-[13px] leading-[16px] text-[#777] font-light tracking-[0.03rem]">title</a>
+                      class="transition-all duration-[0.3s] ease-in-out font-Poppins text-[13px] leading-[16px] text-[#777] font-light tracking-[0.03rem]">{{product.title}}</a>
                     <div class="bb-price flex flex-wrap justify-between">
                       <div class="inner-price mx-[-3px]">
-                        <span class="old-price px-[3px] text-[14px] text-[#686e7d]">-22%</span>
+                        <span v-if="product.discount_percent > 0" class="old-price px-[3px] text-[14px] text-[#686e7d]">-{{product.discount_percent}}%</span>
                       </div>
-                      <span class="last-items text-[14px] text-[#686e7d]">$222</span>
+                      <span class="last-items text-[14px] text-[#686e7d]">${{ product.discounted_price }}</span>
                     </div>
                   </div>
                 </div>
