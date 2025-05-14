@@ -23,10 +23,17 @@ const router = createRouter({
           path: '/cart',
           name: 'cart',
           component: () => import('../views/CartView.vue'),
-        },{
+          meta: {
+            requiresAuth: true
+          }
+        },
+        {
           path: '/wishlist',
           name: 'wishlist',
           component: () => import('../views/WishlistView.vue'),
+          meta: {
+            requiresAuth: true
+          }
         },
       {
           path: '/login',
@@ -38,15 +45,25 @@ const router = createRouter({
             name: 'register',
             component: () => import('../views/RegisterView.vue'),
           },
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (About.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import('../views/AboutView.vue'),
-    // },
   ],
 })
+
+ router.beforeEach(async (to) => {
+  // Check if the user is logged in
+  const isLoggedIn = !!localStorage.getItem('token')
+
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    // If not logged in and trying to access a protected route
+    return { name: 'login' }
+  }
+
+  if ((to.name === 'login' || to.name === 'register') && isLoggedIn) {
+    // If logged in and trying to access login/register page
+    return { name: 'home' }
+  }
+
+  return true
+
+ })
 
 export default router
