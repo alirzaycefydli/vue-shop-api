@@ -106,16 +106,11 @@ onMounted(() => {
                       <span class="bb-pro-rating">
                         <i
                           v-for="(star,index) in parseInt(product.rating || 0)" :key="index" class="ri-star-fill float-left text-[15px] mr-[3px] leading-[18px] text-[#fea99a]"></i>
-                       <!--  <i 
-                        v-if="Math.floor(product.rating) < 5" 
-                        v-for="(star,index) in (5 - Math.floor(product.rating))" :key="index"
-                          class="ri-star-line float-left text-[15px] mr-[3px] leading-[18px] text-[#777]"></i>-->
-
-                          <template v-if="(product.rating || 0) < 5">
+                        <template v-if="(product.rating || 0) < 5">
                             <i 
                           v-for="(star,index) in (5 - parseInt(product.rating || 0))" :key="index"
                           class="ri-star-line float-left text-[15px] mr-[3px] leading-[18px] text-[#777]"></i>
-                          </template>
+                        </template>
                       </span> 
                     </div>
                     <a href="#"

@@ -6,6 +6,14 @@ export const useProductStore = defineStore('productStore',()=>{
     const newProducts = async () => {
         return await api.get('products')
     }
-    
-    return {newProducts}
+
+    const productById = async (id) => {
+        return await api.get(`products/${id}`)
+    }
+
+    const userReview = async (data) => {
+        return await api.post('reviews', data)
+    }
+
+    return {newProducts, productById, userReview}
 })
