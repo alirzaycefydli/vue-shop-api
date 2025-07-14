@@ -4,15 +4,18 @@ import 'vue3-carousel/carousel.css'
 import { Carousel, Slide, Navigation } from 'vue3-carousel'
 import { onMounted, ref, computed } from 'vue'
 import {initAccordions} from 'flowbite'
+import { useRoute } from 'vue-router'
 
 const productStore = useProductStore()
 const data = ref(null)
 
+const route = useRoute()
+
 const productData = async ()=>{
     try {
-        const response = await productStore.productById('1')
+        const response = await productStore.productById(route.params.id)
         data.value = response.data.data
-        console.log("Product fetched successfully:", data.value);
+        //console.log("Product fetched successfully:", data.value);
     } catch (error) {
         console.error("Error fetching product:", error);
         data.value = null;
@@ -40,12 +43,12 @@ const userReview = ref({
   rating: 4,
 })
 
+
 const handleSubmitReview = async () => {
   try {
-    console.log(userReview.value)
     const response = await productStore.userReview({
       product_id: data.value.id,
-      user_id: 26,
+      user_id: route.params.id,
       ...userReview.value,
     })
     console.log("Review submitted successfully:", response.data);

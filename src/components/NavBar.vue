@@ -1,3 +1,24 @@
+<script setup>
+import { useProductStore } from '@/stores/product';
+import { onMounted, ref } from 'vue';
+const productStore = useProductStore()
+
+const data = ref(null)
+const categories = async ()=>{
+    try {
+        const response = await productStore.categories()
+        data.value = response.data.data
+        console.log("Categories fetched successfully:", data.value);
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+        data.value = null;
+    }
+}
+
+onMounted(() => {
+    categories()
+})
+</script>
 <template>
     <section>
         <div
@@ -19,32 +40,19 @@
                           :to="{name: 'home'}">Home</RouterLink>
                       </li>
                       <li class="nav-item bb-main-dropdown flex items-center mr-[45px]">
-                        <RouterLink
+                        <a
                           class="nav-link font-Poppins relative p-[0] leading-[28px] text-[15px] font-medium text-[#3d4750] block tracking-[0.03rem]"
-                          :to="{name: 'products'}">Categories</RouterLink>
+                          >Categories</a>
                         <ul
                           class="mega-menu min-w-full transition-all duration-[0.3s] ease-in-out mt-[25px] pl-[30px] absolute top-[36px] z-[16] text-left opacity-[0] invisible left-[0] right-[auto] bg-[#fff] border-[1px] border-solid border-[#eee] grid grid-cols-3 gap-[30px] rounded-[10px]">
 
-                          <li class="flex items-center">
-                            <a href="#"
+                          <li v-for="category in data" :key="category.id" class="flex items-center">
+                            <RouterLink :to="{name: 'products', params: {id: category.id}}"
                               class="transition-all duration-[0.3s] ease-in-out font-Poppins py-[10px] leading-[22px] text-[14px] font-normal tracking-[0.03rem] text-[#686e7d] hover:text-[#6c7fd8] capitalize">
-                              Title
-                            </a>
+                              {{ category?.title }}
+                            </RouterLink>
                           </li>
-
-                          <li class="flex items-center">
-                            <a href="#"
-                              class="transition-all duration-[0.3s] ease-in-out font-Poppins py-[10px] leading-[22px] text-[14px] font-normal tracking-[0.03rem] text-[#686e7d] hover:text-[#6c7fd8] capitalize">
-                              Title
-                            </a>
-                          </li>
-
-                          <li class="flex items-center">
-                            <a href="#"
-                              class="transition-all duration-[0.3s] ease-in-out font-Poppins py-[10px] leading-[22px] text-[14px] font-normal tracking-[0.03rem] text-[#686e7d] hover:text-[#6c7fd8] capitalize">
-                              Title
-                            </a>
-                          </li>
+                          
                         </ul>
                       </li>
                     </ul>
@@ -185,7 +193,3 @@
         </div>
     </section>
 </template>
-
-<script setup>
-
-</script>

@@ -11,9 +11,18 @@ export const useProductStore = defineStore('productStore',()=>{
         return await api.get(`products/${id}`)
     }
 
+    const productByCategory = async (categoryId, sortBy=null) => {
+        const params = sortBy ? { params: { sortBy } } : {};
+        return await api.get(`category/${categoryId}`, params)
+    }
+
+    const categories = async () => {
+        return await api.get('category')
+    }
+
     const userReview = async (data) => {
         return await api.post('reviews', data)
     }
 
-    return {newProducts, productById, userReview}
+    return {newProducts, productById, userReview, productByCategory, categories}
 })
