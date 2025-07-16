@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useProductStore } from '@/stores/product'
 import { useWishlistStore } from '@/stores/wishlist';
+import {useCartStore} from '@/stores/cart';
 
 const products = ref({
   id:'',
@@ -33,6 +34,16 @@ const addToWishlist = async (productId) => {
     console.log('Product added to wishlist:', productId)
   } catch (error) {
     console.error('Error adding product to wishlist:', error)
+  }
+}
+
+const cartStore = useCartStore()
+const addToCart = async (productId, quantity) => {
+  try {
+    await cartStore.addToCart(productId, quantity)
+    console.log('Product added to cart:', productId)
+  } catch (error) {
+    console.error('Error adding product to cart:', error)
   }
 }
 
@@ -99,9 +110,7 @@ onMounted(() => {
                       </li>
                       <li
                         class="bb-btn-group transition-all duration-[0.3s] ease-in-out w-[35px] h-[35px] mx-[2px] flex items-center justify-center text-[#fff] bg-[#fff] border-[1px] border-solid border-[#eee] rounded-[10px]">
-                        <form id="33" class="w-[35px] h-[35px] flex items-center justify-center">
-                          <input type="hidden" name="product_id" value="1" />
-                          <input type="hidden" name="quantity" value="1" />
+                        <form @submit.prevent="addToCart(product.id,1)" class="w-[35px] h-[35px] flex items-center justify-center">
                           <button type="submit" title="Add to Cart"
                             class="w-[35px] h-[35px] flex items-center justify-center">
                             <i

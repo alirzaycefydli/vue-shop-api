@@ -1,8 +1,9 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 import { useProductStore } from '@/stores/product'
 import { useWishlistStore } from '@/stores/wishlist';
-import { RouterLink, useRoute } from 'vue-router'
+import {useCartStore} from '@/stores/cart';
 
 const productStore = useProductStore()
 const products = ref(null)
@@ -37,6 +38,16 @@ const addToWishlist = async (productId) => {
     console.log('Product added to wishlist:', productId)
   } catch (error) {
     console.error('Error adding product to wishlist:', error)
+  }
+}
+
+const cartStore = useCartStore()
+const addToCart = async (productId, quantity) => {
+  try {
+    await cartStore.addToCart(productId, quantity)
+    console.log('Product added to cart:', productId)
+  } catch (error) {
+    console.error('Error adding product to cart:', error)
   }
 }
 
@@ -149,7 +160,7 @@ watch(
                                             </li>
                                             <li
                                                 class="bb-btn-group transition-all duration-[0.3s] ease-in-out w-[35px] h-[35px] mx-[2px] flex items-center justify-center text-[#fff] bg-[#fff] border-[1px] border-solid border-[#eee] rounded-[10px]">
-                                                <a href="javascript:void(0)" title="Add To Cart"
+                                                <a @click.prevent="addToCart(product.id, 1)" title="Add To Cart"
                                                     class="w-[35px] h-[35px] flex items-center justify-center">
                                                     <i
                                                         class="ri-shopping-bag-4-line transition-all duration-[0.3s] ease-in-out text-[18px] text-[#777] leading-[10px]"></i>
