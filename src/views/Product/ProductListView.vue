@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import { useProductStore } from '@/stores/product'
+import { useWishlistStore } from '@/stores/wishlist';
 import { RouterLink, useRoute } from 'vue-router'
 
 const productStore = useProductStore()
@@ -27,6 +28,16 @@ const categoryData = async () => {
         console.error("Error fetching categories:", error)
         categories.value = []
     }
+}
+
+const wishlistStore = useWishlistStore()
+const addToWishlist = async (productId) => {
+  try {
+    await wishlistStore.addToWishlist(productId)
+    console.log('Product added to wishlist:', productId)
+  } catch (error) {
+    console.error('Error adding product to wishlist:', error)
+  }
 }
 
 onMounted(() => {
@@ -130,7 +141,7 @@ watch(
                                             class="bb-pro-actions transition-all duration-[0.3s] ease-in-out my-[0] mx-[auto] absolute z-[9] left-[0] right-[0] bottom-[0] flex flex-row items-center justify-center opacity-[0]">
                                             <li
                                                 class="bb-btn-group transition-all duration-[0.3s] ease-in-out w-[35px] h-[35px] mx-[2px] flex items-center justify-center text-[#fff] bg-[#fff] border-[1px] border-solid border-[#eee] rounded-[10px]">
-                                                <a href="javascript:void(0)" title="Wishlist"
+                                                <a @click.prevent="addToWishlist(product.id)" title="Wishlist"
                                                     class="w-[35px] h-[35px] flex items-center justify-center">
                                                     <i
                                                         class="ri-heart-line transition-all duration-[0.3s] ease-in-out text-[18px] text-[#777] leading-[10px]"></i>

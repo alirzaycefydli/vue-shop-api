@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useProductStore } from '@/stores/product'
+import { useWishlistStore } from '@/stores/wishlist';
 
 const products = ref({
   id:'',
@@ -23,6 +24,18 @@ const newProducts = async () => {
     errors.value = error.response?.data || {}
   }
 }
+
+const wishlistStore = useWishlistStore()
+
+const addToWishlist = async (productId) => {
+  try {
+    await wishlistStore.addToWishlist(productId)
+    console.log('Product added to wishlist:', productId)
+  } catch (error) {
+    console.error('Error adding product to wishlist:', error)
+  }
+}
+
 onMounted(() => {
   newProducts()
 })
@@ -76,7 +89,7 @@ onMounted(() => {
                       class="bb-pro-actions transition-all duration-[0.3s] ease-in-out my-[0] mx-[auto] absolute z-[9] left-[0] right-[0] bottom-[0] flex flex-row items-center justify-center opacity-[0]">
                       <li
                         class="bb-btn-group transition-all duration-[0.3s] ease-in-out w-[35px] h-[35px] mx-[2px] flex items-center justify-center text-[#fff] bg-[#fff] border-[1px] border-solid border-[#eee] rounded-[10px]">
-                        <form id="22">
+                        <form @submit.prevent="addToWishlist(product.id)" class="w-[35px] h-[35px] flex items-center justify-center">
                           <button title="Add to Wishlist"
                             class="w-[35px] h-[35px] flex items-center justify-center">
                             <i
