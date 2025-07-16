@@ -1,16 +1,55 @@
 <script setup>
-// import {ref, onMounted} from 'vue'
-// import axios from 'axios'
+import { ref, onMounted } from 'vue';
+import { useProductStore } from '@/stores/product'
+import { useWishlistStore } from '@/stores/wishlist';
+import {useCartStore} from '@/stores/cart';
 
- 
-// const data = ref({});
+const products = ref({
+  id:'',
+  title:'',
+  short_description:'',
+  brand:'',
+  price:'',
+  discount_percent:'',
+  is_featured:'',
+})
+const errors = ref({})
+const productStore = useProductStore()
 
-// onMounted(() => {
-// axios
-//       .get('http://127.0.0.1:8000/api/v1/products')
-//       .then(response => data.value = response.data.data)
-//       .catch(error => console.log(error))
-// })
+const newProducts = async () => {
+  try {
+    const value = await productStore.newProducts()
+    products.value = value.data.data
+  } catch (error) {
+    console.error('Error fetching products:', error)
+    errors.value = error.response?.data || {}
+  }
+}
+
+const wishlistStore = useWishlistStore()
+
+const addToWishlist = async (productId) => {
+  try {
+    await wishlistStore.addToWishlist(productId)
+    console.log('Product added to wishlist:', productId)
+  } catch (error) {
+    console.error('Error adding product to wishlist:', error)
+  }
+}
+
+const cartStore = useCartStore()
+const addToCart = async (productId, quantity) => {
+  try {
+    await cartStore.addToCart(productId, quantity)
+    console.log('Product added to cart:', productId)
+  } catch (error) {
+    console.error('Error adding product to cart:', error)
+  }
+}
+
+onMounted(() => {
+  newProducts()
+})
 </script>
 
 <template>
@@ -37,7 +76,7 @@
         <div class="w-full">
           <div class="tab-content">
             <div class="flex flex-wrap w-full">
-              <div
+              <div v-for="product in products" :key="product.id"
                 class="min-[1200px]:w-[25%] min-[768px]:w-[33.33%] w-[50%] max-[480px]:w-full px-[12px] mb-[24px]">
                 <div
                   class="bb-pro-box bg-[#fff] border-[1px] border-solid border-[#eee] rounded-[20px]">
@@ -51,17 +90,17 @@
                       <div
                         class="inner-img relative block overflow-hidden pointer-events-none rounded-t-[20px]">
                         <img class="main-img transition-all duration-[0.3s] ease-in-out w-full"
-                          src="../assets/img/product/1.jpg" alt="title">
+                          :src="product.image" alt="{{ product.title }}">
                         <img
                           class="hover-img transition-all duration-[0.3s] ease-in-out absolute z-[2] top-[0] left-[0] opacity-[0] w-full"
-                          src="../assets/img/product/1.jpg" alt="title">
+                          :src="product.image" alt="{{ product.title }}">
                       </div>
                     </a>
                     <ul
                       class="bb-pro-actions transition-all duration-[0.3s] ease-in-out my-[0] mx-[auto] absolute z-[9] left-[0] right-[0] bottom-[0] flex flex-row items-center justify-center opacity-[0]">
                       <li
                         class="bb-btn-group transition-all duration-[0.3s] ease-in-out w-[35px] h-[35px] mx-[2px] flex items-center justify-center text-[#fff] bg-[#fff] border-[1px] border-solid border-[#eee] rounded-[10px]">
-                        <form id="22">
+                        <form @submit.prevent="addToWishlist(product.id)" class="w-[35px] h-[35px] flex items-center justify-center">
                           <button title="Add to Wishlist"
                             class="w-[35px] h-[35px] flex items-center justify-center">
                             <i
@@ -71,9 +110,7 @@
                       </li>
                       <li
                         class="bb-btn-group transition-all duration-[0.3s] ease-in-out w-[35px] h-[35px] mx-[2px] flex items-center justify-center text-[#fff] bg-[#fff] border-[1px] border-solid border-[#eee] rounded-[10px]">
-                        <form id="33" class="w-[35px] h-[35px] flex items-center justify-center">
-                          <input type="hidden" name="product_id" value="1" />
-                          <input type="hidden" name="quantity" value="1" />
+                        <form @submit.prevent="addToCart(product.id,1)" class="w-[35px] h-[35px] flex items-center justify-center">
                           <button type="submit" title="Add to Cart"
                             class="w-[35px] h-[35px] flex items-center justify-center">
                             <i
@@ -87,27 +124,24 @@
                     <div class="bb-pro-subtitle mb-[8px] flex flex-wrap justify-between">
                       <p
                         class="transition-all duration-[0.3s] ease-in-out font-Poppins text-[13px] leading-[16px] text-[#777] font-light tracking-[0.03rem]">
-                        Brand</p>
+                        {{ product.brand }}</p>
                       <span class="bb-pro-rating">
                         <i
-                          class="ri-star-fill float-left text-[15px] mr-[3px] leading-[18px] text-[#fea99a]"></i>
-                        <i
-                          class="ri-star-fill float-left text-[15px] mr-[3px] leading-[18px] text-[#fea99a]"></i>
-                        <i
-                          class="ri-star-fill float-left text-[15px] mr-[3px] leading-[18px] text-[#fea99a]"></i>
-                        <i
-                          class="ri-star-fill float-left text-[15px] mr-[3px] leading-[18px] text-[#fea99a]"></i>
-                        <i
+                          v-for="(star,index) in parseInt(product.rating || 0)" :key="index" class="ri-star-fill float-left text-[15px] mr-[3px] leading-[18px] text-[#fea99a]"></i>
+                        <template v-if="(product.rating || 0) < 5">
+                            <i 
+                          v-for="(star,index) in (5 - parseInt(product.rating || 0))" :key="index"
                           class="ri-star-line float-left text-[15px] mr-[3px] leading-[18px] text-[#777]"></i>
-                      </span>
+                        </template>
+                      </span> 
                     </div>
                     <a href="#"
-                      class="transition-all duration-[0.3s] ease-in-out font-Poppins text-[13px] leading-[16px] text-[#777] font-light tracking-[0.03rem]">title</a>
+                      class="transition-all duration-[0.3s] ease-in-out font-Poppins text-[13px] leading-[16px] text-[#777] font-light tracking-[0.03rem]">{{product.title}}</a>
                     <div class="bb-price flex flex-wrap justify-between">
                       <div class="inner-price mx-[-3px]">
-                        <span class="old-price px-[3px] text-[14px] text-[#686e7d]">-22%</span>
+                        <span v-if="product.discount_percent > 0" class="old-price px-[3px] text-[14px] text-[#686e7d]">-{{product.discount_percent}}%</span>
                       </div>
-                      <span class="last-items text-[14px] text-[#686e7d]">$222</span>
+                      <span class="last-items text-[14px] text-[#686e7d]">${{ product.discounted_price }}</span>
                     </div>
                   </div>
                 </div>
